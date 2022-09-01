@@ -35,15 +35,7 @@ const initialQuizState = null
 function quiz(state = initialQuizState, action) {
   switch (action.type) {
     case SET_QUIZ_INTO_STATE:
-      if (!action.payload) {
-        return false;
-      } else {
-        return {
-          question: action.payload.question,
-          answers: action.payload.answers,
-          quiz_id: action.payload.quiz_id
-        };
-      }
+     return action.payload;
     }
   return state
 }
@@ -52,11 +44,7 @@ const initialSelectedAnswerState = null
 function selectedAnswer(state = initialSelectedAnswerState, action) {
   switch (action.type) {
     case SET_SELECTED_ANSWER:
-      if(action?.payload?.message) {
-        return action.payload.message
-      } else {
-        return false;
-      }
+      return action.payload;
   }
   return state
 }
@@ -65,19 +53,13 @@ const initialMessageState = '';
 function infoMessage(state = initialMessageState, action) {
   switch(action.type) {
     case SET_INFO_MESSAGE:
-      console.log('action: ', action);
-      if(action?.payload) {
-        return `Congrats: "${action.payload.question}" is a great question!`
-      } else {
-        return false;
-      }
+      return action.payload;
   }
   return state;
 }
 
 const initialLatestAction = null;
 function latestAction(state = initialLatestAction, action) {
-  console.log('action: ', action);
   switch(action.type) {
     case SET_LATEST_ACTION:
       if(action.payload) {
@@ -95,16 +77,18 @@ const initialFormState = {
   newFalseAnswer: '',
 }
 function form(state = initialFormState, action) {
-  // switch(action.type) {
-  //   case SET_INFO_MESSAGE:
-  //     if (action?.payload?.message) {
-  //       return action.payload.message
-  //     } else {
-  //       return false;
-  //     }
-  //   case INPUT_CHANGE:
+  switch(action.type) {
+    case INPUT_CHANGE:
+      return {
+        ...state,
+        [action.payload.id]: action.payload.value
+      }
+      
+    case RESET_FORM:
+      return initialFormState;
 
-  // }
+  }
+  
 
   return state;
 }

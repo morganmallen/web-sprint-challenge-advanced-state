@@ -27,12 +27,12 @@ export const setMessage = (payload) => {
   return { type: SET_INFO_MESSAGE, payload: payload };
  }
 
-export const setQuiz = () => {
-  return { type: SET_QUIZ_INTO_STATE };
+export const setQuiz = (quiz) => {
+  return { type: SET_QUIZ_INTO_STATE, payload: quiz };
  }
 
-export const inputChange = () => {
-  return { type: INPUT_CHANGE };
+export const inputChange = (value, id) => {
+  return { type: INPUT_CHANGE, payload: {value, id} };
  }
 
 export const resetForm = () => {
@@ -50,11 +50,11 @@ export function fetchQuiz() {
     // On successful GET:
     // - Dispatch an action to send the obtained quiz to its state
     // resetForm();
-    dispatch({ type: SET_QUIZ_INTO_STATE, payload: false });
+    dispatch(setQuiz(null));
     axios
       .get("http://localhost:9000/api/quiz/next")
       .then((res) => {
-        dispatch({ type: SET_QUIZ_INTO_STATE, payload: res.data });
+        dispatch(setQuiz(res.data));
       })
       .catch((err) => console.log(err));
   };
@@ -64,35 +64,32 @@ export const postAnswer = (answer) => (dispatch) => {
   // - Dispatch an action to reset the selected answer state
   // - Dispatch an action to set the server message to state
   // - Dispatch the fetching of the next quiz
-  console.log('answer: ', answer);
 
   axios
     .post("http://localhost:9000/api/quiz/answer", answer)
     .then((res) => {
-      console.log('res: ', res);
-      dispatch(selectAnswer(res.data));
+      dispatch(selectAnswer(null));
+      dispatch(setMessage(res.data.message));
+      // dispatch(fetchQuiz());
     })
-    .catch((err) => console.log(err));
-    dispatch(resetForm());
+    .catch((err) => console.log(err))
+    .finally(() => dispatch(fetchQuiz()));
 };
 
 export const postQuiz = (quiz) => (dispatch) => {
   // On successful POST:
   // - Dispatch the correct message to the the appropriate state
   // - Dispatch the resetting of the form
-  console.log('quiz: ', quiz);
   axios
     .post("http://localhost:9000/api/quiz/new", quiz)
     .then((res) => {
-      console.log('res: ', res);
-      dispatch({ type: SET_QUIZ_INTO_STATE, payload: res.data })
-      dispatch(setMessage(res.data));
+      dispatch(setMessage(`Congrats: "${res.data.question}" is a great question!`));
       dispatch(resetForm());
-
+      // props.postLatestAction('submitQuiz');
 })
     .catch((err) => console.log(err));
 };
 
-export const postLatestAction = (action) => (dispatch) => {
-  dispatch(setLatestAction(action));
-} 
+// export const postLatestAction = (action) => (dispatch) => {
+//   dispatch(setLatestAction(action));
+// } 

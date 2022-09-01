@@ -1,132 +1,106 @@
-import React, { useEffect, useState } from "react";
-import { connect, useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
 import * as actionCreators from "../state/action-creators";
 
 export function Quiz(props) {
-  const [submitCount, setSubmitCount] = useState(0);
-  const [selectedButton, setSelectedButton] = useState("");
-  const [answerId, setAnswerId] = useState("");
-  const [currentQuiz, setCurrentQuiz] = useState();
-  const [submittedAnswer, setSubmittedAnswer] = useState(false);
-
-  const store = useSelector(state => state);
-
+  const { quiz, selectedAnswer } = props;
 
   useEffect(() => {
-    if (submittedAnswer || !store.quiz) {
+    if (!quiz) {
       props.fetchQuiz();
-      setSubmittedAnswer(false);
     }
-    props.setMessage();
-    setCurrentQuiz(window.localStorage.setItem('currentQuiz', JSON.stringify(store.quiz)));
-    setSelectedButton(window.localStorage.setItem('selectedButton', selectedButton));
-  }, [submitCount]);
-
-  useEffect(() => {
-    const tempQuiz = window.localStorage.getItem('currentQuiz');
-    setCurrentQuiz(JSON.parse(tempQuiz));
-    // window.localStorage.getItem('selectedButton');
   }, []);
 
   const submitAnswer = () => {
-    setSubmitCount(submitCount + 1);
-    setSelectedButton(0);
-    setSubmittedAnswer(true);
     const answer = {
-      quiz_id: props.quiz.quiz_id,
-      answer_id: answerId,
+      quiz_id: quiz.quiz_id,
+      answer_id: selectedAnswer,
     };
     props.postAnswer(answer);
-    props.postLatestAction('submitAnswer');
   };
 
-  const selectAnswer = (evt) => {
-    const { id, value } = evt.target;
-      setSelectedButton(value);
-      setAnswerId(id);
+  const selectAnswer = (id) => {
+      props.selectAnswer(id);
   };
-
-  console.log('selectedButton:' , selectedButton)
-  console.log('currentQuiz: ', currentQuiz);
 
   return (
     <div id="wrapper">
       {
         // quiz already in state? Let's use that, otherwise render "Loading next quiz..."
-        currentQuiz ? (
+        quiz ? (
           <>
-            <h2>{currentQuiz.question}</h2>
+            <h2>{quiz.question}</h2>
 
             <div id="quizAnswers">
               <div
-                className={selectedButton === currentQuiz.answers?.[0].text ? "answer selected" : "answer"}
+                className={selectedAnswer === quiz.answers?.[0].answer_id  ? "answer selected" : "answer"}
               >
-                {currentQuiz.answers?.[0].text}
+                {quiz.answers?.[0].text}
                 <button
-                  id={currentQuiz.answers?.[0].answer_id}
-                  value={currentQuiz.answers?.[0].text}
-                  onClick={selectAnswer}
+                  id={quiz.answers?.[0].answer_id}
+                  value={quiz.answers?.[0].text}
+                  onClick={() => selectAnswer(quiz.answers[0].answer_id)}
                 >
-                  {selectedButton === currentQuiz.answers?.[0].text ? "SELECTED" : "Select"}
+                  {selectedAnswer === quiz.answers?.[0].answer_id ? "SELECTED" : "Select"}
                 </button>
               </div>
 
               <div
-                className={selectedButton === currentQuiz.answers?.[1].text ? "answer selected" : "answer"}
+                className={selectedAnswer === quiz.answers?.[1].answer_id  ? "answer selected" : "answer"}
               >
-                {currentQuiz.answers?.[1].text}
+                {quiz.answers?.[1].text}
                 <button
-                  id={currentQuiz.answers?.[1].answer_id}
-                  value={currentQuiz.answers?.[1].text}
-                  onClick={selectAnswer}
+                  id={quiz.answers?.[1].answer_id}
+                  value={quiz.answers?.[1].text}
+                  onClick={() => selectAnswer(quiz.answers[1].answer_id)}
                 >
-                  {selectedButton === currentQuiz.answers?.[1].text ? "SELECTED" : "Select"}
+                  {selectedAnswer === quiz.answers?.[1].answer_id  ? "SELECTED" : "Select"}
                 </button>
               </div>
             </div>
 
             <button
-              disabled={!selectedButton}
+              disabled={!selectedAnswer}
               id="submitAnswerBtn"
               onClick={submitAnswer}
             >
               Submit answer
             </button>
           </>
-        ) : props.quiz ? (
+        ) : quiz ? (
           <>
-            <h2>{props.quiz.question}</h2>
+            <h2>{quiz.question}</h2>
 
             <div id="quizAnswers">
               <div
-                className={selectedButton === props.quiz.answers?.[0].text ? "answer selected" : "answer"}
+                className={selectedAnswer === quiz.answers?.[0].text ? "answer selected" : "answer"}
               >
-                {props.quiz.answers?.[0].text}
+                {quiz.answers?.[0].text}
                 <button
-                  id={props.quiz.answers?.[0].answer_id}
-                  value={props.quiz.answers?.[0].text}
-                  onClick={selectAnswer}
+                  id={quiz.answers?.[0].answer_id}
+                  value={quiz.answers?.[0].text}
+                  onClick={() => selectAnswer(quiz.answers[0].answer_id)}
                 >
-                  {selectedButton === props.quiz.answers?.[0].text ? "SELECTED" : "Select"}
+                  {selectedAnswer === quiz.answers?.[0].text ? "SELECTED" : "Select"}
                 </button>
               </div>
 
               <div
-                className={selectedButton === props.quiz.answers?.[1].text ? "answer selected" : "answer"}
+                className={selectedAnswer === quiz.answers?.[1].text ? "answer selected" : "answer"}
               >
-                {props.quiz.answers?.[1].text}
+                {quiz.answers?.[1].text}
                 <button
-                  id={props.quiz.answers?.[1].answer_id}
-                  value={props.quiz.answers?.[1].text}
-                  onClick={selectAnswer}
+                  id={quiz.answers?.[1].answer_id}
+                  value={quiz.answers?.[1].text}
+                  onClick={() => selectAnswer(quiz.answers[0].answer_id)}
                 >
-                  {selectedButton === props.quiz.answers?.[1].text ? "SELECTED" : "Select"}
+                  {selectedAnswer === quiz.answers?.[1].text ? "SELECTED" : "Select"}
                 </button>
               </div>
             </div>
 
             <button
-              disabled={!selectedButton}
+              disabled={!selectedAnswer}
               id="submitAnswerBtn"
               onClick={submitAnswer}
             >
